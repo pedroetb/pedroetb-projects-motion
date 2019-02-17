@@ -1,0 +1,46 @@
+version: '3.7'
+
+services:
+  caddy:
+    image: ${IMAGE_NAME:-lucaslorentz/caddy-docker-proxy}:${IMAGE_TAG:-alpine}
+    environment:
+      - CADDY_DOCKER_LABEL_PREFIX
+    networks:
+      - motion-net
+      - traefik-net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      mode: replicated
+      replicas: ${CADDY_REPLICAS:-1}
+      labels:
+        traefik.ui.frontend.auth.basic.users: ${MOTION_UI_AUTH}
+        traefik.ui.frontend.rule: Host:${MOTION_SUBDOMAIN}.${PUBLIC_HOSTNAME}
+        traefik.stream.frontend.auth.basic.users: ${MOTION_STREAM_AUTH}
+        traefik.stream.frontend.rule: Host:${MOTION_SUBDOMAIN}.${PUBLIC_HOSTNAME};PathPrefix:/{id:[0-9]+}
+        traefik.ui.backend: motion-ui
+        traefik.ui.port: "${CADDY_UI_PORT}"
+        traefik.stream.backend: motion-stream
+        traefik.stream.port: "${CADDY_STREAM_PORT}"
+      restart_policy:
+        delay: ${CADDY_RESTART_POLICY_DELAY:-10s}
+        window: ${CADDY_RESTART_POLICY_WINDOW:-30s}
+      placement:
+        constraints:
+          - ${CADDY_PLACEMENT_CONSTRAINT:-node.hostname == node}
+      resources:
+        limits:
+          cpus: "${CADDY_LIMITS_CPUS:-0.1}"
+          memory: ${CADDY_LIMITS_MEMORY:-32M}
+        reservations:
+          memory: ${CADDY_RESERVATIONS_MEMORY:-8M}
+
+networks:
+  motion-net:
+    name: ${MOTION_NET_NAME:-motion-net}
+    driver: overlay
+    attachable: true
+
+  traefik-net:
+    name: ${TRAEFIK_NET_NAME:-traefik-net}
+    external: true
