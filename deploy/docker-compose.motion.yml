@@ -7,9 +7,6 @@ services:
       - TZ
     networks:
       - motion-net
-    ports:
-      - "${MOTION_UI_PORT}:${MOTION_UI_PORT}"
-      - "${MOTION_STREAM_PORT}:${MOTION_STREAM_PORT}"
     volumes:
       - ./config:/usr/local/etc/motion
       - motion-vol:/var/lib/motion
