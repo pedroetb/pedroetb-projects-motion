@@ -2,42 +2,39 @@ version: '2.4'
 
 services:
   motion:
-    image: ${IMAGE_NAME:-pedroetb/arm-motion}:${IMAGE_TAG:-latest}
+    image: ${MOTION_IMAGE_NAME:-pedroetb/motion}:${MOTION_IMAGE_TAG:-latest}
+    container_name: ${CONTAINER_NAME}
     environment:
-      - TZ
+      TZ:
     networks:
-      - motion-net
+      motion-net:
     volumes:
-      - ./config:/usr/local/etc/motion
+      - ./config-motion:/usr/local/etc/motion
       - motion-vol:/var/lib/motion
     devices:
-      - ${MOTION_VIDEO_DEVICE:-/dev/video0}
+      - ${VIDEO_DEVICE:-/dev/video0}
     healthcheck:
-      test: curl --silent --output /dev/null http://localhost:${MOTION_UI_PORT}
-      interval: ${MOTION_HEALTHCHECK_INTERVAL:-30s}
-      timeout: ${MOTION_HEALTHCHECK_TIMEOUT:-10s}
-      retries: ${MOTION_HEALTHCHECK_RETRIES:-3}
-      start_period: ${MOTION_HEALTHCHECK_START_PERIOD:-1m}
-    labels:
-      - ${CADDY_DOCKER_LABEL_PREFIX}_0.address=:${CADDY_UI_PORT}
-      - ${CADDY_DOCKER_LABEL_PREFIX}_0.targetport=${MOTION_UI_PORT}
-      - ${CADDY_DOCKER_LABEL_PREFIX}_1.address=:${CADDY_STREAM_PORT}
-      - ${CADDY_DOCKER_LABEL_PREFIX}_1.targetport=${MOTION_STREAM_PORT}
-      - ${CADDY_DOCKER_LABEL_PREFIX}.tls=off
+      test: wget --quiet --tries=1 --spider http://localhost:${UI_PORT}
+      interval: ${HEALTHCHECK_INTERVAL:-1m}
+      timeout: ${HEALTHCHECK_TIMEOUT:-30s}
+      retries: ${HEALTHCHECK_RETRIES:-10}
+      start_period: ${HEALTHCHECK_START_PERIOD:-1m}
     restart: always
-    mem_limit: ${MOTION_MEM_LIMIT:-64M}
-    mem_reservation: ${MOTION_MEM_RESERVATION:-32M}
+    cpus: '${CPUS:-1}'
+    mem_limit: ${MEM_LIMIT:-64M}
+    mem_reservation: ${MEM_RESERVATION:-32M}
 
 networks:
   motion-net:
-    name: ${MOTION_NET_NAME:-motion-net}
+    name: ${MOTION_NET_NAME}
+    driver: ${MOTION_NET_DRIVER}
     external: true
 
 volumes:
   motion-vol:
-    name: ${MOTION_VOLUME_NAME:-motion-vol}
+    name: ${MOTION_VOL_NAME:-motion-vol}
     driver: local
     driver_opts:
-      type: ${MOTION_VOLUME_TYPE}
-      o: ${MOTION_VOLUME_OPTIONS}
-      device: ${MOTION_VOLUME_DEVICE}
+      type: ${MOTION_VOL_TYPE}
+      o: ${MOTION_VOL_OPTIONS}
+      device: ${MOTION_VOL_DEVICE}

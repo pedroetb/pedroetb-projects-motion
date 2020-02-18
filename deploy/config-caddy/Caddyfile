@@ -1,0 +1,13 @@
+:{$CADDY_UI_PORT} {
+	proxy / {$CONTAINER_NAME}:{$UI_PORT} {
+		transparent
+	}
+	tls off
+}
+
+:{$CADDY_STREAM_PORT} {
+	proxy / {$CONTAINER_NAME}:{$STREAM_PORT} {
+		transparent
+	}
+	tls off
+}
