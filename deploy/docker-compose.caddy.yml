@@ -30,6 +30,7 @@ services:
         traefik.http.routers.motion-ui.rule: Host(`${TRAEFIK_SUBDOMAIN}.${TRAEFIK_DOMAIN}`)
         traefik.http.middlewares.motion-ui-auth.basicauth.users: ${TRAEFIK_UI_AUTH}
         traefik.http.routers.motion-ui.middlewares: motion-ui-auth
+        traefik.http.routers.motion-ui.service: motion-ui
         traefik.http.services.motion-ui.loadbalancer.server.port: ${CADDY_UI_PORT}
 
         traefik.http.routers.motion-stream.entrypoints: ${TRAEFIK_ENTRYPOINT}
@@ -37,6 +38,7 @@ services:
         traefik.http.routers.motion-stream.rule: Host(`${TRAEFIK_SUBDOMAIN}.${TRAEFIK_DOMAIN}`) && PathPrefix(`/{id:[0-9]+}`)
         traefik.http.middlewares.motion-stream-auth.basicauth.users: ${TRAEFIK_STREAM_AUTH}
         traefik.http.routers.motion-stream.middlewares: motion-stream-auth
+        traefik.http.routers.motion-stream.service: motion-stream
         traefik.http.services.motion-stream.loadbalancer.server.port: ${CADDY_STREAM_PORT}
       resources:
         limits:
