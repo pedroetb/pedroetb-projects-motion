@@ -14,7 +14,7 @@ services:
     devices:
       - ${VIDEO_DEVICE:-/dev/video0}
     healthcheck:
-      test: wget --quiet --tries=1 --spider http://localhost:${UI_PORT}
+      test: wget --quiet --tries=1 --output-document /dev/null http://localhost:${UI_PORT}
       interval: ${HEALTHCHECK_INTERVAL:-1m}
       timeout: ${HEALTHCHECK_TIMEOUT:-30s}
       retries: ${HEALTHCHECK_RETRIES:-10}
