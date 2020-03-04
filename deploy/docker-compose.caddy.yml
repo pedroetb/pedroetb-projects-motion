@@ -25,6 +25,8 @@ services:
       update_config:
         delay: ${UPDATE_DELAY:-1m}
       labels:
+        traefik.enable: 'true'
+
         traefik.http.routers.motion-ui.entrypoints: ${TRAEFIK_ENTRYPOINT}
         traefik.http.routers.motion-ui.tls.certresolver: ${TRAEFIK_CERTRESOLVER}
         traefik.http.routers.motion-ui.rule: Host(`${TRAEFIK_SUBDOMAIN}.${TRAEFIK_DOMAIN}`)
